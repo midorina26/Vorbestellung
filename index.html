@@ -67,7 +67,7 @@
   }
   .lang-btn {
     font-family: var(--font);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.1em;
     padding: 5px 13px;
@@ -188,7 +188,7 @@
   }
 
   .prog-label {
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -209,7 +209,7 @@
   }
 
   .screen-eyebrow {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.18em;
     color: var(--orange);
@@ -227,7 +227,7 @@
   }
 
   .screen-sub {
-    font-size: 13.5px;
+    font-size: 15.5px;
     font-weight: 300;
     color: var(--white-mid);
     line-height: 1.55;
@@ -239,7 +239,7 @@
 
   label {
     display: block;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -403,7 +403,7 @@
     width: 100%;
     padding: 16px;
     font-family: var(--font);
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     letter-spacing: 0.04em;
     background: var(--orange);
@@ -416,6 +416,13 @@
   }
   .btn-primary:hover { background: #e8721f; }
   .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled {
+    background: var(--bg-muted);
+    color: var(--white-soft);
+    border: 1px solid var(--border);
+    cursor: not-allowed;
+    transform: none;
+  }
 
   /* ── Confirm box ────────────────────────── */
   .confirm-box {
@@ -428,9 +435,10 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    padding: 7px 0;
+    padding: 9px 0;
     border-bottom: 1px solid var(--bg-muted);
     font-size: 13.5px;
+    gap: 8px;
   }
   .confirm-row:last-child { border-bottom: none; }
   .confirm-label {
@@ -439,8 +447,35 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--white-soft);
+    flex-shrink: 0;
+    width: 90px;
   }
-  .confirm-value { font-weight: 500; color: var(--white); text-align: right; max-width: 55%; }
+  .confirm-value {
+    font-weight: 500;
+    color: var(--white);
+    text-align: left;
+    flex: 1;
+  }
+  .confirm-edit {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--orange);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .confirm-edit:hover { opacity: 0.75; }
+  .confirm-right {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex: 1;
+  }
 
   .info-block {
     background: var(--orange-bg);
@@ -566,7 +601,6 @@
       <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
     <div class="logo-area">
-      <p class="exhibition-name" id="lbl-exhibition">Fotoausstellung · Berlin</p>
       <h1 class="catalog-title" id="lbl-catalog-title"><span>K</span>ATALOG<br>VORBESTELLUNG</h1>
       <div class="header-rule"></div>
     </div>
@@ -610,7 +644,7 @@
         <div class="field-error" id="vorname-error" data-de="Bitte Vornamen eingeben." data-en="Please enter your first name.">Bitte Vornamen eingeben.</div>
       </div>
 
-      <button class="btn-primary" onclick="goTo(2)" data-de="Weiter →" data-en="Continue →">Weiter →</button>
+      <button class="btn-primary" onclick="goTo(2)" id="btn-step1" disabled data-de="Weiter →" data-en="Continue →">Weiter →</button>
     </div>
 
     <!-- Screen 2: Email -->
@@ -626,14 +660,14 @@
       </div>
 
       <div class="newsletter-wrap">
-        <p class="newsletter-label-txt" id="nl-question-text" data-de="Möchtest du unseren Newsletter erhalten? (optional)" data-en="Would you like to receive our newsletter? (optional)">Möchtest du unseren Newsletter erhalten? (optional)</p>
+        <p class="newsletter-label-txt" id="nl-question-text" data-de="Möchtest du unseren Newsletter erhalten?" data-en="Would you like to receive our newsletter?">Möchtest du unseren Newsletter erhalten?</p>
         <div class="nl-toggle">
           <button class="nl-btn" id="nl-yes" onclick="setNewsletter(true)" data-de="Ja, gerne" data-en="Yes, please">Ja, gerne</button>
           <button class="nl-btn" id="nl-no" onclick="setNewsletter(false)" data-de="Nein danke" data-en="No thanks">Nein danke</button>
         </div>
       </div>
 
-      <button class="btn-primary" onclick="goTo(3)" data-de="Weiter →" data-en="Continue →">Weiter →</button>
+      <button class="btn-primary" onclick="goTo(3)" id="btn-step2" disabled data-de="Weiter →" data-en="Continue →">Weiter →</button>
     </div>
 
     <!-- Screen 3: Quantity -->
@@ -692,7 +726,7 @@
     <!-- Confirmation: Pickup -->
     <div class="screen" id="screen-confirm-pickup">
       <p class="screen-eyebrow" data-de="Bestätigung" data-en="Confirmation">Bestätigung</p>
-      <h2 class="screen-title" data-de="Vorbestellung eingegangen" data-en="Pre-order received">Vorbestellung eingegangen</h2>
+      <h2 class="screen-title" data-de="Alles korrekt? Dann bitte bestätigen." data-en="All correct? Please confirm.">Alles korrekt? Dann bitte bestätigen.</h2>
 
       <div class="confirm-box" id="pickup-summary"></div>
 
@@ -700,13 +734,13 @@
         <span id="pickup-msg-text"></span>
       </div>
 
-      <button class="btn-primary" onclick="goTo('thanks')" data-de="Bestätigen →" data-en="Confirm →">Bestätigen →</button>
+      <button class="btn-primary" onclick="goTo('thanks')" data-de="Bestellung bestätigen →" data-en="Confirm order →">Bestellung bestätigen →</button>
     </div>
 
     <!-- Confirmation: Shipping -->
     <div class="screen" id="screen-confirm-shipping">
       <p class="screen-eyebrow" data-de="Bestätigung" data-en="Confirmation">Bestätigung</p>
-      <h2 class="screen-title" data-de="Vorbestellung eingegangen" data-en="Pre-order received">Vorbestellung eingegangen</h2>
+      <h2 class="screen-title" data-de="Alles korrekt? Dann bitte bestätigen." data-en="All correct? Please confirm.">Alles korrekt? Dann bitte bestätigen.</h2>
 
       <div class="confirm-box" id="shipping-summary"></div>
 
@@ -714,7 +748,7 @@
         <span id="shipping-msg-text"></span>
       </div>
 
-      <button class="btn-primary" onclick="goTo('thanks')" data-de="Verstanden →" data-en="Got it →">Verstanden →</button>
+      <button class="btn-primary" onclick="goTo('thanks')" data-de="Bestellung bestätigen →" data-en="Confirm order →">Bestellung bestätigen →</button>
     </div>
 
     <!-- Thank you screen -->
@@ -755,6 +789,7 @@ const T = {
     shippingMsg: '<strong>Bitte hinterlasse deine Lieferadresse vor Ort.</strong> Du findest dazu eine Adresskarte beim Ausstellungspersonal. Die Versandkosten von 5 € werden separat abgerechnet.',
     summaryName: 'Name', summaryEmail: 'E-Mail', summaryQty: 'Exemplare', summaryDelivery: 'Versand', summaryNewsletter: 'Newsletter',
     newsletterYes: 'Ja', newsletterNo: 'Nein', newsletterNone: '—',
+    editLabel: 'Ändern',
     pickup: 'Selbstabholung', shipping: 'Versand (+5 €)'
   },
   en: {
@@ -766,6 +801,7 @@ const T = {
     shippingMsg: '<strong>Please leave your delivery address on-site.</strong> You\'ll find an address card with the exhibition staff. The €5 shipping fee will be charged separately.',
     summaryName: 'Name', summaryEmail: 'Email', summaryQty: 'Copies', summaryDelivery: 'Delivery', summaryNewsletter: 'Newsletter',
     newsletterYes: 'Yes', newsletterNo: 'No', newsletterNone: '—',
+    editLabel: 'Edit',
     pickup: 'Self-pickup', shipping: 'Shipping (+€5)'
   }
 };
@@ -781,12 +817,19 @@ function setLang(lang) {
     if (txt) el.innerHTML = txt;
   });
   const t = T[lang];
-  document.getElementById('lbl-exhibition').textContent = t.exhibition;
   document.getElementById('lbl-catalog-title').innerHTML = t.catalogTitle;
   if (document.getElementById('screen-thanks').classList.contains('active')) {
     document.getElementById('thanks-headline').innerHTML = t.thanksHeadline;
     document.getElementById('order-hint-text').textContent = t.orderHint;
     renderThanksSummary();
+  }
+  // 確認画面が表示中の場合も再レンダリング
+  const summaryHTML = state.email ? buildSummaryHTML(t) : null;
+  if (summaryHTML) {
+    const pickupBox = document.getElementById('pickup-summary');
+    const shippingBox = document.getElementById('shipping-summary');
+    if (pickupBox) pickupBox.innerHTML = summaryHTML;
+    if (shippingBox) shippingBox.innerHTML = summaryHTML;
   }
 }
 
@@ -885,6 +928,7 @@ function setNewsletter(val) {
   state.newsletter = val;
   document.getElementById('nl-yes').className = 'nl-btn' + (val === true  ? ' selected-yes' : '');
   document.getElementById('nl-no').className  = 'nl-btn' + (val === false ? ' selected-no'  : '');
+  checkStep2();
 }
 
 // ─── Quantity ──────────────────────────────────────────
@@ -910,6 +954,13 @@ function generateOrderNumber() {
   return prefix + seq;
 }
 
+// ─── Edit from confirmation ────────────────────────────
+function editStep(step) {
+  document.getElementById('progress-bar').style.display = 'flex';
+  updateProgress(step);
+  showScreen(step);
+}
+
 // ─── Submit order ──────────────────────────────────────
 function submitOrder() {
   state.delivery = document.querySelector('input[name="delivery"]:checked').value;
@@ -931,26 +982,42 @@ function submitOrder() {
 function buildSummaryHTML(t) {
   const deliveryLabel = state.delivery === 'pickup' ? t.pickup : t.shipping;
   const nlLabel = state.newsletter === true ? t.newsletterYes : state.newsletter === false ? t.newsletterNo : t.newsletterNone;
+  const editLabel = t.editLabel;
   return `
     <div class="confirm-row">
       <span class="confirm-label">${t.summaryName}</span>
-      <span class="confirm-value">${state.name}, ${state.vorname}</span>
+      <div class="confirm-right">
+        <span class="confirm-value">${state.name}, ${state.vorname}</span>
+        <button class="confirm-edit" onclick="editStep(1)">${editLabel}</button>
+      </div>
     </div>
     <div class="confirm-row">
       <span class="confirm-label">${t.summaryEmail}</span>
-      <span class="confirm-value">${state.email}</span>
+      <div class="confirm-right">
+        <span class="confirm-value">${state.email}</span>
+        <button class="confirm-edit" onclick="editStep(2)">${editLabel}</button>
+      </div>
     </div>
     <div class="confirm-row">
       <span class="confirm-label">${t.summaryQty}</span>
-      <span class="confirm-value">${state.qty}</span>
+      <div class="confirm-right">
+        <span class="confirm-value">${state.qty}</span>
+        <button class="confirm-edit" onclick="editStep(3)">${editLabel}</button>
+      </div>
     </div>
     <div class="confirm-row">
       <span class="confirm-label">${t.summaryDelivery}</span>
-      <span class="confirm-value">${deliveryLabel}</span>
+      <div class="confirm-right">
+        <span class="confirm-value">${deliveryLabel}</span>
+        <button class="confirm-edit" onclick="editStep(4)">${editLabel}</button>
+      </div>
     </div>
     <div class="confirm-row">
       <span class="confirm-label">${t.summaryNewsletter}</span>
-      <span class="confirm-value">${nlLabel}</span>
+      <div class="confirm-right">
+        <span class="confirm-value">${nlLabel}</span>
+        <button class="confirm-edit" onclick="editStep(2)">${editLabel}</button>
+      </div>
     </div>
   `;
 }
@@ -991,14 +1058,34 @@ async function submitToSheets() {
   }
 }
 
-// ─── Init ──────────────────────────────────────────────
-document.querySelectorAll('input[type="text"], input[type="email"]').forEach(input => {
-  input.addEventListener('input', () => {
-    input.classList.remove('error');
-    const errId = input.id + '-error';
-    const errEl = document.getElementById(errId);
-    if (errEl) errEl.classList.remove('show');
-  });
+// ─── Init: リアルタイム入力チェック ───────────────────
+function checkStep1() {
+  const nameOk = document.getElementById('name').value.trim().length > 0;
+  const vorOk  = document.getElementById('vorname').value.trim().length > 0;
+  document.getElementById('btn-step1').disabled = !(nameOk && vorOk);
+}
+
+function checkStep2() {
+  const emailVal = document.getElementById('email').value.trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+  const nlOk = state.newsletter !== null;
+  document.getElementById('btn-step2').disabled = !(emailOk && nlOk);
+}
+
+document.getElementById('name').addEventListener('input', () => {
+  document.getElementById('name').classList.remove('error');
+  document.getElementById('name-error').classList.remove('show');
+  checkStep1();
+});
+document.getElementById('vorname').addEventListener('input', () => {
+  document.getElementById('vorname').classList.remove('error');
+  document.getElementById('vorname-error').classList.remove('show');
+  checkStep1();
+});
+document.getElementById('email').addEventListener('input', () => {
+  document.getElementById('email').classList.remove('error');
+  document.getElementById('email-error').classList.remove('show');
+  checkStep2();
 });
 </script>
 </body>
