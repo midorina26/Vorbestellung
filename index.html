@@ -754,7 +754,6 @@
     <!-- Thank you screen -->
     <div class="screen" id="screen-thanks">
       <div class="thank-icon">✦</div>
-      <p class="screen-eyebrow" style="text-align:center;" data-de="Vielen Dank" data-en="Thank you">Vielen Dank</p>
       <h2 class="screen-title" style="text-align:center; font-size:1.9rem;" id="thanks-headline">Vielen Dank für<br>deine Bestellung!</h2>
 
       <div class="order-number-box">
@@ -1022,9 +1021,36 @@ function buildSummaryHTML(t) {
   `;
 }
 
+function buildThanksHTML(t) {
+  const deliveryLabel = state.delivery === 'pickup' ? t.pickup : t.shipping;
+  const nlLabel = state.newsletter === true ? t.newsletterYes : state.newsletter === false ? t.newsletterNo : t.newsletterNone;
+  return `
+    <div class="confirm-row">
+      <span class="confirm-label">${t.summaryName}</span>
+      <span class="confirm-value">${state.name}, ${state.vorname}</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-label">${t.summaryEmail}</span>
+      <span class="confirm-value">${state.email}</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-label">${t.summaryQty}</span>
+      <span class="confirm-value">${state.qty}</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-label">${t.summaryDelivery}</span>
+      <span class="confirm-value">${deliveryLabel}</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-label">${t.summaryNewsletter}</span>
+      <span class="confirm-value">${nlLabel}</span>
+    </div>
+  `;
+}
+
 function renderThanksSummary() {
   const t = T[state.lang];
-  document.getElementById('thanks-summary').innerHTML = buildSummaryHTML(t);
+  document.getElementById('thanks-summary').innerHTML = buildThanksHTML(t);
 }
 
 // ─── Google Sheets submission ──────────────────────────
