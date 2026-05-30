@@ -364,9 +364,6 @@
     text-transform: none;
     letter-spacing: normal;
     margin-bottom: 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
   }
   .delivery-desc {
     font-size: 12.5px;
@@ -699,7 +696,10 @@
           <div class="delivery-card">
             <div class="delivery-radio"></div>
             <div class="delivery-info">
-              <div class="delivery-name" data-de="Selbstabholung" data-en="Self-pickup">Selbstabholung <span class="delivery-badge" data-de="Kostenlos" data-en="Free">Kostenlos</span></div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="delivery-name" data-de="Selbstabholung" data-en="Self-pickup">Selbstabholung</div>
+                <span class="delivery-badge" data-de="Kostenlos" data-en="Free">Kostenlos</span>
+              </div>
             </div>
           </div>
         </label>
@@ -709,7 +709,10 @@
           <div class="delivery-card">
             <div class="delivery-radio"></div>
             <div class="delivery-info">
-              <div class="delivery-name" data-de="Versand" data-en="Shipping">Versand <span class="delivery-badge" data-de="<span class='badge-price'>+5 €</span>" data-en="<span class='badge-price'>+€5</span>"><span class='badge-price'>+5 €</span></span></div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="delivery-name" data-de="Versand" data-en="Shipping">Versand</div>
+                <span class="delivery-badge">+5 €</span>
+              </div>
             </div>
           </div>
         </label>
@@ -846,7 +849,7 @@ function showScreen(id) {
   if (el) { el.classList.add('active'); el.scrollIntoView({behavior:'smooth', block:'start'}); }
 }
 
-function goTo(step) {
+async function goTo(step) {
   if (step === 2) {
     if (!validateStep1()) return;
     currentScreen = 2;
@@ -862,7 +865,16 @@ function goTo(step) {
     updateProgress(4);
     showScreen(4);
   } else if (step === 'thanks') {
-    state.orderNumber = generateOrderNumber();
+    // ボタンをローディング状態に
+    const confirmBtns = document.querySelectorAll('#screen-confirm-pickup .btn-primary, #screen-confirm-shipping .btn-primary');
+    confirmBtns.forEach(btn => {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>' + (state.lang === 'de' ? 'Wird gesendet…' : 'Sending…');
+    });
+
+    const orderNumber = await submitToSheets();
+    state.orderNumber = orderNumber;
+
     renderThanksSummary();
     document.getElementById('order-number-display').textContent = state.orderNumber;
     const t = T[state.lang];
@@ -870,7 +882,6 @@ function goTo(step) {
     document.getElementById('order-hint-text').textContent = t.orderHint;
     document.getElementById('progress-bar').style.display = 'none';
     showScreen('thanks');
-    submitToSheets();
   }
 }
 
@@ -934,17 +945,15 @@ function changeQty(delta) {
 // ─── Order number generator ────────────────────────────
 function generateOrderNumber() {
   const now = new Date();
-  const dd = String(now.getDate()).padStart(2, '0');
   const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const prefix = dd + mm;
+  const dd = String(now.getDate()).padStart(2, '0');
+  const prefix = mm + dd;
 
-  let counters = JSON.parse(localStorage.getItem('order_counters') || '{}');
-  const key = prefix;
-  if (!counters[key]) counters[key] = 1;
-  const seq = String(counters[key]).padStart(3, '0');
-  counters[key]++;
-  localStorage.setItem('order_counters', JSON.stringify(counters));
+  let counter = parseInt(localStorage.getItem('order_counter_total') || '0');
+  counter++;
+  localStorage.setItem('order_counter_total', String(counter));
 
+  const seq = String(counter).padStart(3, '0');
   return prefix + seq;
 }
 
@@ -1049,11 +1058,13 @@ function renderThanksSummary() {
 }
 
 // ─── Google Sheets submission ──────────────────────────
-// ⚠️  Replace APPS_SCRIPT_URL with your deployed Google Apps Script Web App URL
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx7viyl5iIFx8182nvEeogS0a77Gh94vDPIjxHoXcz7PTYGU3ohZItJDwYpyHJdDmbz/exec';
 
 async function submitToSheets() {
-  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return; // skip if not configured
+  const now = new Date();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const datePrefix = mm + dd;
 
   const payload = {
     name: state.name,
@@ -1062,21 +1073,28 @@ async function submitToSheets() {
     stueck: state.qty,
     selbstabholung: state.delivery === 'pickup' ? 'Ja' : '',
     lieferung: state.delivery === 'shipping' ? 'Ja' : '',
-    bestellnummer: state.orderNumber,
     newsletter: state.newsletter === true ? 'Ja' : state.newsletter === false ? 'Nein' : '',
-    bezahlung: ''
+    bezahlung: '',
+    datePrefix: datePrefix
   };
 
   try {
-    await fetch(APPS_SCRIPT_URL, {
+    const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
+    const data = await response.json();
+    if (data.bestellnummer) return data.bestellnummer;
   } catch (e) {
     console.error('Sheets submission failed:', e);
   }
+
+  // フォールバック：通信失敗時はローカルで生成
+  let counter = parseInt(localStorage.getItem('order_counter_total') || '0');
+  counter++;
+  localStorage.setItem('order_counter_total', String(counter));
+  return datePrefix + String(counter).padStart(3, '0');
 }
 
 // ─── Init: リアルタイム入力チェック ───────────────────
